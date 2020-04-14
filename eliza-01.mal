@@ -1,6 +1,5 @@
 ; (load-file "F:\JKL\JK-code\eliza\eliza-01.mal")
-
-; (def! f (fn* (n) (* n 2)))
+; (pat-match '( I need a ?X) '(I need a vacation))
 
 ;;; Are x and y equal? (Don't check inside strings)
 (def! simple-equal (fn* (x y)
@@ -10,21 +9,27 @@
 			(simple-equal (first x) (first y))
 			(simple-equal (rest x) (rest y))))))
 
-
-;; (def! f (fn* () 1 2))
-
 ; Is X a variable (a symbol beginning with '?'
-(def! variab1e-p (fn* (x)
+(def! variable? (fn* (x)
 	(and
-		(symbolp x) 
-		(equal (char (symbol-name x) 0) "?"))))
-
+		(symbol? x)
+		(= (char (symbol-name x) 0) "?"))))
+		
+; True if x is not a sequence, false otherwise. (atomic? '()) is true because () == nil
+(def! atomic? (fn* (x)
+	(if (sequential? x)
+		(if (empty? x)
+			true
+			false)
+		true)))
+		
 ;; Does pattern match input? Any variable can match anything.
 (def! pat-match (fn* (pattern input)
-	(if (variable-p pattern)
+	(if (variable? pattern)
 		true
-		(if (or (atom pattern) (atom input))
-			(eql pattern input)
+		(if (or (atomic? pattern) (atomic? input))
+			(= pattern input)
 			(and
 				(pat-match (first pattern) (first input))
 				(pat-match (rest pattern) (rest input)))))))
+
